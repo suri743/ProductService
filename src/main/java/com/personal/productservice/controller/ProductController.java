@@ -2,6 +2,7 @@ package com.personal.productservice.controller;
 
 import com.personal.productservice.dto.CreateFakeStoreProductDto;
 import com.personal.productservice.dto.ProductResponseDto;
+import com.personal.productservice.exceptions.ProductNotFoundException;
 import com.personal.productservice.models.Product;
 import com.personal.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +23,8 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/products/{id}")
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable long id) {
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable long id)
+        throws ProductNotFoundException {
         Product product = productService.getProductById(String.valueOf(id));
         return new ResponseEntity<>(ProductResponseDto.from(product),HttpStatus.OK);
     }
@@ -33,7 +34,7 @@ public class ProductController {
 
         return productService.getAllProducts()
             .stream().map(ProductResponseDto::from)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @PostMapping("/products")
